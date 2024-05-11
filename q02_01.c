@@ -1,6 +1,3 @@
-// 12S23005 - Ariella U.C Sihombing
-// 12S23046 - Anastasya T.B. Siahaan
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -17,7 +14,8 @@ int main(int _argc, char **_argv)
         fprintf(stderr, "Memory allocation failed for students\n");
         return 1;
     }
-    struct dorm_t *dorms = malloc(MAX_DORMS * sizeof(dorm_t));
+
+    struct dorm_t *dorms = malloc(MAX_DORMS * sizeof(struct dorm_t));
     if (!dorms) {
         fprintf(stderr, "Memory allocation failed for dorms\n");
         free(students);
@@ -49,11 +47,11 @@ int main(int _argc, char **_argv)
             break;
         } else if (strcmp(line, "student-print-all") == 0) {
             for (short j = 0; j < students_size; j++) {
-                printf("%s|%s|%s|%s\n", students[j].id, students[j].name, students[j].year, students[j].gender == GENDER_MALE? "male" : "female");
+                printf("%s|%s|%s|%s\n", students[j].id, students[j].name, students[j].year, students[j].gender == GENDER_MALE ? "male" : "female");
             }
         } else if (strcmp(line, "student-print-all-detail") == 0) {
             for (short j = 0; j < students_size; j++) {
-                printf("%s|%s|%s|%s|unassigned\n", students[j].id, students[j].name, students[j].year, students[j].gender == GENDER_MALE? "male" : "female");
+                printf("%s|%s|%s|%s|unassigned\n", students[j].id, students[j].name, students[j].year, students[j].gender == GENDER_MALE ? "male" : "female");
             }
         } else {
             char *token = strtok(line, penghubung);
@@ -109,14 +107,21 @@ int main(int _argc, char **_argv)
                     dorms[dorm_size] = create_dorm(name, capacity, GENDER_FEMALE);
                     dorm_size++;
                 }
-            } else if (strcmp(token, "assign-student")==0) {
-                for (int j=0; j<students_size; j++){
-                    printf("%s|%s|%s|%s|%s\n", students[j].id, students[j].name, students[j].year, students[j].gender == GENDER_MALE? "male" : "female", dorms[j].name);
+            } else if (strcmp(token, "assign-student") == 0) {
+                for (int i = 0; i < students_size; i++) {
+                    for (int j = 0; j < dorm_size; j++) {
+                        if (students[i].dorm == NULL &&
+                            students[i].gender == dorms[j].gender &&
+                            dorms[j].residents_num < dorms[j].capacity) {
+                            students[i].dorm = &dorms[j];
+                            dorms[j].residents_num++;
+                            break;
+                        }
+                    }
                 }
             }
         }
     }
-
     free(students);
     free(dorms);
 

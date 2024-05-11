@@ -26,5 +26,5 @@ void print_dorm (struct dorm_t dorm);
 void print_dorm_all_detail ( struct dorm_t dorm_);
 short dormindex ( char* _name, struct dorm_t dorms, int length);
 typedef struct dorm_t dorm_t;
-
+void empty_dorm(struct dorm_t *dorm, char *students);
 #endif
