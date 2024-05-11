@@ -12,9 +12,11 @@ struct student_t {
     struct dorm_t *dorm;
 };
 
-struct student_t create_student(char *_id, char *_name, char *_year, enum gender_t _gender);
-void print_student (struct student_t student);
-void print_student_all_detail (struct student_t student);
-void assign_student (struct student_t *students, int students_size, struct dorm_t *dorms, int dorm_size);
+void student_print_detail(struct student_t *_student, unsigned short int _size);
+void student_print_all(struct student_t *_student, unsigned short int _size);
+struct student_t create_student(char *std_id, char *std_name, char *std_year, enum gender_t std_gender);
+void assign_student(struct student_t *_student, struct dorm_t *_dorm, unsigned short int idx_std, unsigned short int idx_drm, int *found);
+unsigned short int get_index_student (struct student_t *_student, unsigned short int size_std, char *_idstd, int *found);
+void dorm_empty(struct student_t *_student, struct dorm_t *_dorm, unsigned short int poin, unsigned short int size_std);
 
 #endif

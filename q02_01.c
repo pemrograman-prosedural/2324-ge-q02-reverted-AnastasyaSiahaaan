@@ -9,120 +9,86 @@
 
 int main(int _argc, char **_argv)
 {
-    struct student_t *students = malloc(MAX_STUDENTS * sizeof(struct student_t));
-    if (!students) {
-        fprintf(stderr, "Memory allocation failed for students\n");
-        return 1;
-    }
+    char input[100];
+    char command[50];
 
-    struct dorm_t *dorms = malloc(MAX_DORMS * sizeof(struct dorm_t));
-    if (!dorms) {
-        fprintf(stderr, "Memory allocation failed for dorms\n");
-        free(students);
-        return 1;
-    }
+    unsigned short int size_std = 0, size_dorm = 0;
 
-    unsigned short dorm_size = 0;
-    unsigned short students_size = 0;
-    char line[100];
-    char *penghubung = "#";
+
+     struct student_t *std = malloc(20 * sizeof(struct student_t));
+     struct dorm_t *dorms = malloc(20 * sizeof(struct dorm_t));
+
 
     while (1) {
-        line[0] = '\0';
-        fgets(line, 100, stdin);
         fflush(stdin);
+        fgets(input, sizeof(input), stdin);
+        input[strcspn(input,"\r\n")] = 0;
 
-        int len = strlen(line);
-        for (short i = 0; i < len; i++) {
-            if (line[i] == '\r' || line[i] == '\n') {
-                for (short b = i; b < len; b++) {
-                    line[b] = line[b + 1];
-                }
-                len--;
-                i--;
-            }
+        strcpy(command , strtok(input, "#"));
+        if (strcmp(command, "student-print-all-detail") == 0){
+            student_print_detail(std, size_std);
+        }else if(strcmp(command, "dorm-print-all-detail") == 0){
+            print_dorm_detail(dorms, size_dorm);
+        }else if(strcmp(command, "student-print-all") == 0){
+            // printf("masuk\n");
+            student_print_all(std, size_std);
+        }else if(strcmp(command, "dorm-print-all") == 0){
+            print_all_dorm(dorms, size_dorm);
         }
+        else if (strcmp(command, "student-add") == 0){
+            // printf("masuk\n");
+            char data_id[10], data_name[50], data_year[10], data_gender[10];
 
-        if (strcmp(line, "---") == 0) {
+            strcpy(data_id ,strtok(NULL, "#"));
+            strcpy(data_name ,strtok(NULL, "#"));
+            strcpy(data_year , strtok(NULL, "#"));
+            strcpy(data_gender, strtok(NULL, "#"));
+
+            std[size_std] = create_student(data_id, data_name, data_year, gender_to_value (data_gender));
+            size_std++;
+        }else if(strcmp(command, "dorm-add") == 0) {
+            // printf("masuk\n");
+            char dorm_name[10], dorm_size[5], dorm_gender[10];
+            unsigned short int capacity = 0;
+
+            strcpy(dorm_name ,strtok(NULL, "#"));
+            strcpy(dorm_size , strtok(NULL, "#"));
+            capacity = atoi(dorm_size);
+            strcpy(dorm_gender, strtok(NULL, "#"));
+
+            dorms[size_dorm] = create_dorm(dorm_name, capacity, gender_to_value (dorm_gender));
+            size_dorm++;
+        }else if(strcmp(command, "assign-student") == 0){
+            char data_id[10], data_name[30];
+            strcpy(data_id ,strtok(NULL, "#"));
+            strcpy(data_name, strtok(NULL, "#"));
+            
+            unsigned short int poin_std = 0;
+            unsigned short int poin_drm = 0;
+            int found = 0;
+
+            poin_std = get_index_student (std, size_std, data_id, &found);
+            if(found == 0) continue;
+
+            poin_drm = get_index_dorm (dorms, size_dorm, data_name);
+            
+            assign_student(std, dorms, poin_std, poin_drm, &found);
+        }else if(strcmp(command, "dorm-empty") == 0){
+            char data_name[30];
+            strcpy(data_name, strtok(NULL, "#"));
+            
+            unsigned short int poin_drm = 0;
+
+            poin_drm = get_index_dorm (dorms, size_dorm, data_name);
+            
+            dorm_empty(std, dorms, poin_drm, size_std);
+
+        }else if(strcmp(command, "---") == 0) {
             break;
-        } else if (strcmp(line, "student-print-all") == 0) {
-            for (short j = 0; j < students_size; j++) {
-                printf("%s|%s|%s|%s\n", students[j].id, students[j].name, students[j].year, students[j].gender == GENDER_MALE ? "male" : "female");
-            }
-        } else if (strcmp(line, "student-print-all-detail") == 0) {
-            for (short j = 0; j < students_size; j++) {
-                printf("%s|%s|%s|%s|unassigned\n", students[j].id, students[j].name, students[j].year, students[j].gender == GENDER_MALE ? "male" : "female");
-            }
-        } else {
-            char *token = strtok(line, penghubung);
-            if (strcmp(token, "student-add") == 0) {
-                token = strtok(NULL, penghubung);
-                char *id = token;
-                token = strtok(NULL, penghubung);
-                char *name = token;
-                token = strtok(NULL, penghubung);
-                char *year = token;
-                token = strtok(NULL, penghubung);
-
-                if (students_size > 0) {
-                    students = (struct student_t *)realloc(students, (students_size + 1) * sizeof(struct student_t));
-                    if (!students) {
-                        fprintf(stderr, "Memory reallocation failed for students\n");
-                        free(dorms);
-                        return 1;
-                    }
-                }
-
-                if (strcmp(token, "male") == 0) {
-                    students[students_size] = create_student(id, name, year, GENDER_MALE);
-                    students_size++;
-                } else if (strcmp(token, "female") == 0) {
-                    students[students_size] = create_student(id, name, year, GENDER_FEMALE);
-                    students_size++;
-                }
-            } else if (strcmp(token, "dorm-print-all") == 0) {
-                for (short j = 0; j < dorm_size; j++) {
-                    print_dorm(dorms[j]);
-                }
-            } else if (strcmp(token, "dorm-print-all-detail") == 0) {
-                for (short j = 0; j < dorm_size; j++) {
-                    print_dorm_all_detail(dorms[j]);
-                }
-            } else if (strcmp(token, "dorm-add") == 0) {
-                token = strtok(NULL, penghubung);
-                char *name = token;
-                token = strtok(NULL, penghubung);
-                unsigned short capacity = atoi(token);
-                token = strtok(NULL, penghubung);
-
-                if (dorm_size >= MAX_DORMS) {
-                    fprintf(stderr, "Maximum number of dorms reached\n");
-                    continue;
-                }
-
-                if (strcmp(token, "male") == 0) {
-                    dorms[dorm_size] = create_dorm(name, capacity, GENDER_MALE);
-                    dorm_size++;
-                } else if (strcmp(token, "female") == 0) {
-                    dorms[dorm_size] = create_dorm(name, capacity, GENDER_FEMALE);
-                    dorm_size++;
-                }
-            } else if (strcmp(token, "assign-student") == 0) {
-                for (int i = 0; i < students_size; i++) {
-                    for (int j = 0; j < dorm_size; j++) {
-                        if (students[i].dorm == NULL &&
-                            students[i].gender == dorms[j].gender &&
-                            dorms[j].residents_num < dorms[j].capacity) {
-                            students[i].dorm = &dorms[j];
-                            dorms[j].residents_num++;
-                            break;
-                        }
-                    }
-                }
-            }
         }
     }
-    free(students);
+    
+    free(std);
     free(dorms);
 
     return 0;

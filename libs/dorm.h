@@ -2,6 +2,7 @@
 #define DORM_H
 
 #include "gender.h"
+#include "student.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,10 +22,13 @@ struct dorm_t
   unsigned short residents_num;
 };
 
-struct dorm_t create_dorm (char *_name, unsigned short _capacity, enum gender_t _gender);
-void print_dorm (struct dorm_t dorm);
-void print_dorm_all_detail ( struct dorm_t dorm_);
-short dormindex ( char* _name, struct dorm_t dorms, int length);
-typedef struct dorm_t dorm_t;
-void empty_dorm(struct dorm_t *dorm, char *students);
+void print_dorm_detail (struct dorm_t *dorms, unsigned short int size_dorm);
+void print_all_dorm (struct dorm_t *dorms, unsigned short int size_dorm);
+struct dorm_t create_dorm(char *_name, unsigned short _capacity, enum gender_t _gender);
+
+unsigned short int get_index_dorm (struct dorm_t *_dorm, unsigned short int size_drm, char *_name);
+
+
+
+
 #endif

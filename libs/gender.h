@@ -11,4 +11,7 @@ enum gender_t
     GENDER_FEMALE
 };
 
+char* gender_to_text (enum gender_t mhs_gender);
+unsigned short int gender_to_value (char *_gender);
+
 #endif
